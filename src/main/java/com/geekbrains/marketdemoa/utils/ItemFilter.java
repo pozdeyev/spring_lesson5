@@ -25,5 +25,11 @@ public class ItemFilter {
             spec = spec.and(ItemSpecifications.priceLEThan(maxPrice));
             filterDefinition.append("&max_price=").append(maxPrice);
         }
+
+        //сортировка
+        if (map.containsKey("sort_by") && !map.get("sort_by").isEmpty()) {
+            filterDefinition.append("&sort_by=").append(map.get("sort_by"));
+        }
+
     }
 }

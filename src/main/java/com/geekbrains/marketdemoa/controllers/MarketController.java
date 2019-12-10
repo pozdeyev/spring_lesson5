@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,17 +32,23 @@ public class MarketController {
     @GetMapping("/")
     public String index(Model model, @RequestParam Map<String, String> params) {
         int pageIndex = 0;
+        String sort = "id"; //сортировка по умолчанию
+
+        if (params.containsKey("sort_by") && !params.get("sort_by").isEmpty()) {
+            sort = params.get("sort_by");
+        }
+
+
         if (params.containsKey("p")) {
             pageIndex = Integer.parseInt(params.get("p")) - 1;
         }
-        Pageable pageRequest = PageRequest.of(pageIndex, 10);
+
+        Pageable pageRequest = PageRequest.of(pageIndex, 5, Sort.Direction.ASC, sort);
         ItemFilter itemFilter = new ItemFilter(params);
         Page<Item> page = itemService.findAll(itemFilter.getSpec(), pageRequest);
 
-        List<String> categories = Arrays.stream(Item.Category.values()).map(Item.Category::name).collect(Collectors.toList());
 
         model.addAttribute("filtersDef", itemFilter.getFilterDefinition());
-        model.addAttribute("categories", categories);
         model.addAttribute("page", page);
         return "index";
     }
