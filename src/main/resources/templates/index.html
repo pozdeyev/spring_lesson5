@@ -13,27 +13,40 @@
 <body>
 
 <div class="container">
-    <h1>Заготовка магазина</h1>
-
     <h3>Фильтр</h3>
+
     <form th:action="@{/}" method="GET">
         <div class="input-group">
             <input class="form-control" th:value="${param.min_price}" name="min_price" type="number"
                    placeholder="Минимальная цена"/>
             <input class="form-control" th:value="${param.max_price}" name="max_price" type="number"
                    placeholder="Максимальная цена"/>
-            <select name="category">
-                <option th:text="'Не выбрана'" th:value="null"/>
-                <option th:each="c : ${categories}" th:text="${c}" th:selected="${c == param.category}" th:value="${c}"/>
+            <!--/*
+                        <select name="category">
+                            <option th:text="'Не выбрана'" th:value="null"/>
+                            <option th:each="c : ${categories}" th:text="${c}"
+                                    th:selected="${param.category !=null && c==param.category.toString()}"
+                                    th:value="${c}"/>
+                        </select>*/-->
+
+            <select name="sort_by">
+                <option th:selected="${(param.sort_by !=null) && ('id'==param.sort_by.toString())}"
+                        th:text="'Сортировка по ID'" value="id"/>
+                <option th:selected="${(param.sort_by !=null) && ('price'==param.sort_by.toString())}"
+                        th:text="'Сортировка по цене'" value="price"/>
+                <option th:selected="${(param.sort_by !=null) && ('title'==param.sort_by.toString())}"
+                        th:text="'Сортировка по названию'" value="title"/>
             </select>
-            <span th:text="${param.category}" />
+
+
         </div>
+
         <br>
-        <button type="submit" class="btn btn-warning">Фильтровать</button>
+        <button type="submit" class="btn btn-primary">Активировать фильтр</button>
         <a class="btn btn-warning" th:href="@{'/?p=1'}">Сбросить фильтр</a>
     </form>
     <br>
-    <h3>Каталог товаров</h3>
+    <h3>Список товаров</h3>
     <table class="table table-hover">
         <thead class="thead-dark">
         <tr>
@@ -57,24 +70,29 @@
         </tbody>
     </table>
 
+
     <nav aria-label="Page navigation">
         <ul class="pagination">
-            <!--            <li class="page-item" th:classappend="${!(page.getNumber() > 0) ? 'disabled' : ''}">-->
-            <!--                <a th:class="page-link" th:href="@{'/products?p=' + ${page.getNumber()} + ${filters}}"-->
-            <!--                   th:text="#{paging.prev}"></a>-->
-            <!--            </li>-->
 
+            <li class="page-item">
+                <a class="page-link"
+                   th:href="@{'/?p='+ ${page.previousOrFirstPageable().getPageNumber()+1} + ${filtersDef}}">Prev</a>
+            </li>
             <li class="page-item" th:classappend="${page.getNumber() + 1 == i ? 'active' : ''}"
                 th:each="i : ${#numbers.sequence(1, page.getTotalPages())}">
                 <a th:class="page-link" th:text="${i}" th:href="@{'/?p=' + ${i} + ${filtersDef}}"></a>
             </li>
 
-            <!--            <li class="page-item" th:classappend="${!(page.getNumber() < page.getTotalPages() - 1) ? 'disabled' : ''}">-->
-            <!--                <a th:class="page-link" th:href="@{'/products?pageNumber=' + ${page.getNumber() + 2} + ${filters}}"-->
-            <!--                   th:text="#{paging.next}"></a>-->
-            <!--            </li>-->
+            <li class="page-item">
+                <a class="page-link"
+                   th:href="@{'/?p='+ ${page.nextOrLastPageable().getPageNumber()+1} + ${filtersDef}}">Next</a>
+            </li>
         </ul>
     </nav>
+    <br>
+
+    <span th:text="'Всего товаров (фильтр): ' + ${page.content.size()}"/>
+
 </div>
 
 </body>
